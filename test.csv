@@ -1,0 +1,4 @@
+a,b[0],b[1],c[0][a],c[0][b],c[1][a],c[1][b],#d,e
+1,2,34,ka,kb,sa,sb,dd,ee
+11,12,134,1ka,2kb,s1a,s1b,d1d,e1e
+21,22,234,2ka,2kb,,,d2d,e2e
