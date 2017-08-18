@@ -1,5 +1,6 @@
 require "doctordata/version"
 require 'csv'
+require 'roo'
 require 'faraday'
 
 module Doctordata
@@ -21,6 +22,17 @@ module Doctordata
       def from_csv_filepath(path)
         table = CSV.read(path, headers: true)
         from_csv_table(table)
+      end
+
+      def from_excel(file)
+        xlsx = Roo::Spreadsheet.open(file)
+        hash = {}
+        xlsx.each_with_pagename do |name, sheet|
+          csv_str = sheet.to_csv
+          csv_table = CSV.parse(csv_str, :headers => true)
+          hash[name] = from_csv_table(csv_table)
+        end
+        hash
       end
     end
   end
