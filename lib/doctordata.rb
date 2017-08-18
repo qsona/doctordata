@@ -25,7 +25,7 @@ module Doctordata
       end
 
       def from_excel(file)
-        xlsx = Roo::Spreadsheet.open(file)
+        xlsx = Roo::Spreadsheet.open(file, extension: :xlsx)
         hash = {}
         xlsx.each_with_pagename do |name, sheet|
           csv_str = sheet.to_csv
