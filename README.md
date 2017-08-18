@@ -1,9 +1,5 @@
 # Doctordata
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/doctordata`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
-
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -14,7 +10,7 @@ gem 'doctordata'
 
 And then execute:
 
-    $ bundle
+    $ bundle install
 
 Or install it yourself as:
 
@@ -22,7 +18,33 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Create csv text like below:
+
+```rb
+csv_str = <<EOS
+keyA,#commentB,keyC[0],keyC[1]
+a1,b1,c11,c12
+a2,b2,c21,c22
+EOS
+```
+
+Then, parse this to a hash.
+
+```rb
+Doctordata::Parser.from_csv_str(csv_str)
+# => [{"keyA"=>"a1", "keyC"=>["c11", "c12"]}, {"keyA"=>"a2", "keyC"=>["c21", "c22"]}]
+```
+
+You can write keys in the header as www form. If the key starts with `#`, it will be ignored.
+
+You also parse an xlsx file:
+
+```rb
+Doctordata::Parser.from_excel(excel_file_or_path)
+# => { "Sheet1" => [{"keyA"=>"a1", "keyC"=>["c11", "c12"]}, {"keyA"=>"a2", "keyC"=>["c21", "c22"]}] }
+```
+
+The result is a Hash. Top level key is sheet name, and value is array as same as csv example.
 
 ## Development
 
@@ -32,7 +54,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/doctordata.
+Bug reports and pull requests are welcome on GitHub at https://github.com/qsona/doctordata.
 
 ## License
 
