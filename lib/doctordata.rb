@@ -33,6 +33,7 @@ module Doctordata
         xlsx = Roo::Spreadsheet.open(file_or_path, extension: :xlsx)
         hash = {}
         xlsx.each_with_pagename do |name, sheet|
+          next if name == nil || name == '' || name.start_with?('#')
           csv_str = sheet.to_csv
           hash[name] = from_csv_str(csv_str)
         end
