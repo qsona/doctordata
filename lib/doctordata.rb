@@ -12,7 +12,7 @@ module Doctordata
           map do |row|
             row.
               reject { |k, v| v == nil || v == '' }.
-              reject { |k, v| k.start_with?('#') }.
+              reject { |k, v| k == nil || k == '' || k.start_with?('#') }.
               map { |k, v| "#{k}=#{v}" }.
               join('&')
           end.
