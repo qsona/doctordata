@@ -1,8 +1,6 @@
 require "doctordata/version"
 require 'csv'
 require 'roo'
-require 'faraday'
-require 'pry'
 
 module Doctordata
   class Parser
