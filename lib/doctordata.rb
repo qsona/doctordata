@@ -18,19 +18,54 @@ module Doctordata
         end.
         map do |s|
           result = {}
-          s.each do |k ,v|
+          s.each do |k,v|
             context = result
             subkeys = k.scan(/[^\[\]]+(?:\]?\[\])?/)
             subkeys.each_with_index do |subkey, i|
-              if i+1 == subkeys.length
-                context[subkey] = v
-              else
-                context[subkey] ||= {}
-                context = context[subkey]
+              is_array = subkey =~ /[\[\]]+\Z/
+              subkey = $` if is_array
+              last_subkey = i == subkeys.length - 1
+              if !last_subkey || is_array
+                value_type = is_array ? Array : Hash
+                if context[subkey] && !context[subkey].is_a?(value_type)
+                  raise TypeError, "expected %s (got %s) for param `%s'" % [
+                      value_type.name,
+                      context[subkey].class.name,
+                      subkey
+                  ]
+                end
+                context = (context[subkey] ||= value_type.new)
+              end
+
+              if context.is_a?(Array) && !is_array
+                if !context.last.is_a?(Hash) || context.last.has_key?(subkey)
+                  context << {}
+                end
+                context = context.last
+              end
+
+              if last_subkey
+                if is_array
+                  context << v
+                else
+                  context[subkey] = v
+                end
               end
             end
           end
-          result
+          dehash(result, 0)
+        end
+      end
+
+      def dehash(hash, depth)
+        hash.each do |key, value|
+          hash[key] = dehash(value, depth + 1) if value.kind_of?(Hash)
+        end
+
+        if depth > 0 && !hash.empty? && hash.keys.all? { |k| k =~ /^\d+$/ }
+          hash.keys.sort.inject([]) { |all, key| all << hash[key] }
+        else
+          hash
         end
       end
 
