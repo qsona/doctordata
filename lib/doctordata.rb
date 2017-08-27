@@ -2,21 +2,36 @@ require "doctordata/version"
 require 'csv'
 require 'roo'
 require 'faraday'
+require 'pry'
 
 module Doctordata
   class Parser
     class << self
       def from_csv_table(table)
         # there is much room to do performance tuning
-        table.
-          map do |row|
-            row.
-              reject { |k, v| v == nil || v == '' }.
-              reject { |k, v| k == nil || k == '' || k.start_with?('#') }.
-              map { |k, v| "#{k}=#{v}" }.
-              join('&')
-          end.
-          map { |s| Faraday::NestedParamsEncoder.decode(s) }
+
+        checked_table = table.by_col!.delete_if{ |k, v| k == nil || k == '' || k.start_with?('#') }
+        table.by_row!
+        checked_table.map do |row|
+          row.
+            reject { |k, v| v == nil || v == '' }
+        end.
+        map do |s|
+          result = {}
+          s.each do |k ,v|
+            context = result
+            subkeys = k.scan(/[^\[\]]+(?:\]?\[\])?/)
+            subkeys.each_with_index do |subkey, i|
+              if i+1 == subkeys.length
+                context[subkey] = v
+              else
+                context[subkey] ||= {}
+                context = context[subkey]
+              end
+            end
+          end
+          result
+        end
       end
 
       def from_csv_path(path)
