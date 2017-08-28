@@ -20,11 +20,8 @@ module Doctordata
             context = result
             subkeys = k.scan(/[^\[\]]+(?:\]?\[\])?/)
             subkeys.each_with_index do |subkey, i|
-              is_array = subkey =~ /[\[\]]+\Z/
-              subkey = $` if is_array
-              last_subkey = i == subkeys.length - 1
-              if !last_subkey || is_array
-                value_type = is_array ? Array : Hash
+              if i+1 != subkeys.length
+                value_type = Hash
                 if context[subkey] && !context[subkey].is_a?(value_type)
                   raise TypeError, "expected %s (got %s) for param `%s'" % [
                       value_type.name,
@@ -33,21 +30,8 @@ module Doctordata
                   ]
                 end
                 context = (context[subkey] ||= value_type.new)
-              end
-
-              if context.is_a?(Array) && !is_array
-                if !context.last.is_a?(Hash) || context.last.has_key?(subkey)
-                  context << {}
-                end
-                context = context.last
-              end
-
-              if last_subkey
-                if is_array
-                  context << v
-                else
+              else
                   context[subkey] = v
-                end
               end
             end
           end
