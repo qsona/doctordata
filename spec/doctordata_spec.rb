@@ -20,10 +20,6 @@ RSpec.describe Doctordata do
       it "returns correct json" do
         expect(subject).to eq [{"keyA"=>"a1", "keyC"=>["c11", "c12"]}, {"keyA"=>"a2", "keyC"=>["c21", "c22"]}]
       end
-
-      it "doesn't raise error" do
-        expect { subject }.to_not raise_error
-      end
     end
   end
 end

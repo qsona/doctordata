@@ -29,7 +29,7 @@ module Doctordata
                 end
                 context = (context[subkey] ||= value_type.new)
               else
-                  context[subkey] = v
+                context[subkey] = v
               end
             end
           end
