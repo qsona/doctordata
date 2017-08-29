@@ -1,22 +1,52 @@
 require "doctordata/version"
 require 'csv'
 require 'roo'
-require 'faraday'
 
 module Doctordata
   class Parser
     class << self
       def from_csv_table(table)
         # there is much room to do performance tuning
-        table.
-          map do |row|
-            row.
-              reject { |k, v| v == nil || v == '' }.
-              reject { |k, v| k == nil || k == '' || k.start_with?('#') }.
-              map { |k, v| "#{k}=#{v}" }.
-              join('&')
-          end.
-          map { |s| Faraday::NestedParamsEncoder.decode(s) }
+        checked_table = table.by_col!.delete_if{ |k, v| k == nil || k == '' || k.start_with?('#') }
+        checked_table.by_row!.map do |row|
+          row.
+            reject { |k, v| v == nil || v == '' }
+        end.
+        map do |s|
+          result = {}
+          s.each do |k,v|
+            context = result
+            subkeys = k.scan(/[^\[\]]+(?:\]?\[\])?/)
+            subkeys.each_with_index do |subkey, i|
+              if i+1 != subkeys.length
+                value_type = Hash
+                if context[subkey] && !context[subkey].is_a?(value_type)
+                  raise TypeError, "expected %s (got %s) for param `%s'" % [
+                      value_type.name,
+                      context[subkey].class.name,
+                      subkey
+                  ]
+                end
+                context = (context[subkey] ||= value_type.new)
+              else
+                context[subkey] = v
+              end
+            end
+          end
+          dehash(result, 0)
+        end
+      end
+
+      def dehash(hash, depth)
+        hash.each do |key, value|
+          hash[key] = dehash(value, depth + 1) if value.kind_of?(Hash)
+        end
+
+        if depth > 0 && !hash.empty? && hash.keys.all? { |k| k =~ /^\d+$/ }
+          hash.keys.sort.inject([]) { |all, key| all << hash[key] }
+        else
+          hash
+        end
       end
 
       def from_csv_path(path)
