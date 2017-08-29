@@ -46,6 +46,8 @@ Doctordata::Parser.from_excel(excel_file_or_path)
 
 The result is a Hash. Top level key is sheet name, and value is array as same as csv example.
 
+It skips if the sheet name starts with `#`.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
