@@ -7,10 +7,8 @@ module Doctordata
     class << self
       def from_csv_table(table)
         # there is much room to do performance tuning
-
         checked_table = table.by_col!.delete_if{ |k, v| k == nil || k == '' || k.start_with?('#') }
-        table.by_row!
-        checked_table.map do |row|
+        checked_table.by_row!.map do |row|
           row.
             reject { |k, v| v == nil || v == '' }
         end.
