@@ -5,7 +5,7 @@ require 'roo'
 module Doctordata
   class Parser
     class << self
-      def from_csv_table(table)
+      def from_csv_table(table, options = {})
         # there is much room to do performance tuning
         checked_table = table.by_col!.delete_if{ |k, v| k == nil || k == '' || k.start_with?('#') }
         checked_table.by_row!.map do |row|
@@ -49,23 +49,26 @@ module Doctordata
         end
       end
 
-      def from_csv_path(path)
-        table = CSV.read(path, headers: true)
-        from_csv_table(table)
+      def from_csv_path(path, options = {})
+        json_str = File.read(path)
+        from_csv_str(json_str, options)
       end
 
-      def from_csv_str(csv_str)
+      def from_csv_str(csv_str, options = {})
+        unless options[:skip_lines_number].nil?
+          csv_str =  csv_str.lines.to_a[options[:skip_lines_number].to_i..-1].join
+        end
         table = CSV.parse(csv_str, :headers => true)
         from_csv_table(table)
       end
 
-      def from_excel(file_or_path)
+      def from_excel(file_or_path, options = {})
         xlsx = Roo::Spreadsheet.open(file_or_path, extension: :xlsx)
         hash = {}
         xlsx.each_with_pagename do |name, sheet|
           next if name == nil || name == '' || name.start_with?('#')
           csv_str = sheet.to_csv
-          hash[name] = from_csv_str(csv_str)
+          hash[name] = from_csv_str(csv_str, options)
         end
         hash
       end
