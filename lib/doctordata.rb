@@ -55,10 +55,12 @@ module Doctordata
       end
 
       def from_csv_str(csv_str, options = {})
-        unless options[:skip_lines_number].nil?
-          csv_str =  csv_str.lines.to_a[options[:skip_lines_number].to_i..-1].join
-        end
-        table = CSV.parse(csv_str, :headers => true)
+        skip_lines_number = options[:skip_lines_number]&.to_i || 0
+        arr = CSV.parse(csv_str)
+        headers = arr[skip_lines_number]
+        return [] if headers.nil?
+        rows = arr[(skip_lines_number+1)..-1].map { |row| CSV::Row.new(headers, row) }
+        table = CSV::Table.new(rows)
         from_csv_table(table)
       end
 
