@@ -41,4 +41,37 @@ RSpec.describe Doctordata do
       end
     end
   end
+  describe 'from_table' do
+    let(:array){
+      [
+        ['keyA', '#commentB', 'keyC[0]', 'keyC[1]'],
+        ['a1', 'b1', 'c11', 'c12'],
+        ['a2', 'b2', 'c21', 'c22'],
+      ]
+    }
+    subject do
+      Doctordata::Parser.from_table(array)
+    end
+    it 'returns correct json' do
+      expect(subject).to eq result
+    end
+  end
+  describe 'from_table_hash' do
+    let(:title){"sheet1"}
+    let(:hash){
+      {
+        title => [
+          ['keyA', '#commentB', 'keyC[0]', 'keyC[1]'],
+          ['a1', 'b1', 'c11', 'c12'],
+          ['a2', 'b2', 'c21', 'c22'],
+        ],
+      }
+    }
+    subject do
+      Doctordata::Parser.from_table_hash(hash)
+    end
+    it 'returns correct json' do
+      expect(subject[title]).to eq result
+    end
+  end
 end

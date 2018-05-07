@@ -74,6 +74,21 @@ module Doctordata
         end
         hash
       end
+
+      def from_table(array)
+        headers = array[0]
+        row_array = array[1..-1].map { |row| CSV::Row.new(headers, row) }
+        table = CSV::Table.new(row_array)
+        from_csv_table(table)
+      end
+
+      def from_table_hash(hash)
+        new_hash = {}
+        hash.each do |k, v|
+          new_hash[k] = from_table(v)
+        end
+        new_hash
+      end
     end
   end
 end
