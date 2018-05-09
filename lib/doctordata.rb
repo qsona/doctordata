@@ -7,14 +7,10 @@ module Doctordata
     class << self
       def from_csv_table(table, options = {})
         # there is much room to do performance tuning
-        checked_table = table.by_col!.delete_if{ |k, v| k == nil || k == '' || k.start_with?('#') }
-        checked_table.by_row!.map do |row|
-          row.
-            reject { |k, v| v == nil || v == '' }
-        end.
-        map do |s|
+        table.map do |s|
           result = {}
-          s.each do |k,v|
+          s.each do |k, v|
+            next if k == nil || k == '' || k.start_with?('#') || v == nil || v == ''
             context = result
             subkeys = k.scan(/[^\[\]]+(?:\]?\[\])?/)
             subkeys.each_with_index do |subkey, i|
