@@ -10,7 +10,8 @@ module Doctordata
         table.map do |s|
           result = {}
           s.each do |k, v|
-            next if k == nil || k == '' || k.start_with?('#') || v == nil || v == ''
+            next if k == nil || k == '' || k.start_with?('#')
+            v = nil if v == ''
             context = result
             subkeys = k.scan(/[^\[\]]+(?:\]?\[\])?/)
             subkeys.each_with_index do |subkey, i|
