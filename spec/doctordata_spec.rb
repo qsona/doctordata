@@ -4,9 +4,9 @@ require 'csv'
 
 
 RSpec.describe Doctordata do
-  let(:csv_str){ "keyA,#commentB,keyC[0],keyC[1]\na1,b1,c11,c12\na2,b2,c21,c22,ignored" }
+  let(:csv_str){ "keyA,#commentB,keyC[0],keyC[1]\na1,b1,c11,c12\na2,b2,c21,c22,ignored\n,b3,c31,c32" }
   let(:csv_table){ CSV.parse(csv_str, :headers => true)}
-  let(:result){ [{"keyA"=>"a1", "keyC"=>["c11", "c12"]}, {"keyA"=>"a2", "keyC"=>["c21", "c22"]}] }
+  let(:result){ [{"keyA"=>"a1", "keyC"=>["c11", "c12"]}, {"keyA"=>"a2", "keyC"=>["c21", "c22"]}, {"keyA"=>nil, "keyC"=>["c31", "c32"]}] }
 
   describe 'Doctordata' do
     it "has a version number" do
@@ -34,7 +34,7 @@ RSpec.describe Doctordata do
       end
     end
     context 'with valid csv_str and skip option' do
-      let(:csv_str){ "THIS_IS_UNNECESSARY_LINE\nkeyA,#commentB,keyC[0],keyC[1]\na1,b1,c11,c12\na2,b2,c21,c22\n" }
+      let(:csv_str){ "THIS_IS_UNNECESSARY_LINE\nkeyA,#commentB,keyC[0],keyC[1]\na1,b1,c11,c12\na2,b2,c21,c22\n,b3,c31,c32\n" }
       let(:options){ { skip_lines_number: 1 } }
       it "returns correct json" do
         expect(subject).to eq result
@@ -47,6 +47,7 @@ RSpec.describe Doctordata do
         ['keyA', '#commentB', 'keyC[0]', 'keyC[1]'],
         ['a1', 'b1', 'c11', 'c12'],
         ['a2', 'b2', 'c21', 'c22'],
+        ['', 'b3', 'c31', 'c32'],
       ]
     }
     subject do
@@ -64,6 +65,7 @@ RSpec.describe Doctordata do
           ['keyA', '#commentB', 'keyC[0]', 'keyC[1]'],
           ['a1', 'b1', 'c11', 'c12'],
           ['a2', 'b2', 'c21', 'c22'],
+          ['', 'b3', 'c31', 'c32'],
         ],
       }
     }
