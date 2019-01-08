@@ -4,7 +4,7 @@ require 'csv'
 
 
 RSpec.describe Doctordata do
-  let(:csv_str){ "keyA,#commentB,keyC[0],keyC[1]\na1,b1,c11,c12\na2,b2,c21,c22,ignored\n,b3,c31,c32" }
+  let(:csv_str){ "keyA,#commentB,keyC[0],keyC[1]\na1,b1,c11,c12\n,,,\na2,b2,c21,c22,ignored\n,b3,c31,c32\n,,," }
   let(:csv_table){ CSV.parse(csv_str, :headers => true)}
   let(:result){ [{"keyA"=>"a1", "keyC"=>["c11", "c12"]}, {"keyA"=>"a2", "keyC"=>["c21", "c22"]}, {"keyA"=>nil, "keyC"=>["c31", "c32"]}] }
 
@@ -48,6 +48,7 @@ RSpec.describe Doctordata do
         ['a1', 'b1', 'c11', 'c12'],
         ['a2', 'b2', 'c21', 'c22'],
         ['', 'b3', 'c31', 'c32'],
+        ['', '', '', ''],
       ]
     }
     subject do
@@ -66,6 +67,7 @@ RSpec.describe Doctordata do
           ['a1', 'b1', 'c11', 'c12'],
           ['a2', 'b2', 'c21', 'c22'],
           ['', 'b3', 'c31', 'c32'],
+          ['', '', '', ''],
         ],
       }
     }
