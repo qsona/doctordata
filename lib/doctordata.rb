@@ -7,8 +7,9 @@ module Doctordata
     class << self
       def from_csv_table(table, options = {})
         # there is much room to do performance tuning
-        table.map do |s|
-          next if s.fields.all? { |f| f == nil || f == '' }
+        table.
+        reject { |s| s.fields.all? { |f| f == nil || f == '' } }.
+        map do |s|
           result = {}
           s.each do |k, v|
             next if k == nil || k == '' || k.start_with?('#')
@@ -32,7 +33,7 @@ module Doctordata
             end
           end
           dehash(result, 0)
-        end.compact
+        end
       end
 
       def dehash(hash, depth)
